@@ -1,0 +1,47 @@
+[
+    {
+        "label": "cv2",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "cv2",
+        "description": "cv2",
+        "detail": "cv2",
+        "documentation": {}
+    },
+    {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "current_dir",
+        "kind": 5,
+        "importPath": "Scripts.muwatta.blankimageremover",
+        "description": "Scripts.muwatta.blankimageremover",
+        "peekOfCode": "current_dir = os.path.dirname(os.path.realpath(__file__))\nmuwatta_dir = os.path.join(current_dir,'muwatta')\nfor file in os.listdir(muwatta_dir):\n    file_path = os.path.join(muwatta_dir,file)\n    img = cv.imread(file_path)\n    if np.mean(img) > 254.5:\n        #White image\n        os.remove(file_path) \n        print('Deleted ',file_path)",
+        "detail": "Scripts.muwatta.blankimageremover",
+        "documentation": {}
+    },
+    {
+        "label": "muwatta_dir",
+        "kind": 5,
+        "importPath": "Scripts.muwatta.blankimageremover",
+        "description": "Scripts.muwatta.blankimageremover",
+        "peekOfCode": "muwatta_dir = os.path.join(current_dir,'muwatta')\nfor file in os.listdir(muwatta_dir):\n    file_path = os.path.join(muwatta_dir,file)\n    img = cv.imread(file_path)\n    if np.mean(img) > 254.5:\n        #White image\n        os.remove(file_path) \n        print('Deleted ',file_path)",
+        "detail": "Scripts.muwatta.blankimageremover",
+        "documentation": {}
+    }
+]
