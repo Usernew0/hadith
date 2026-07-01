@@ -1,4 +1,4 @@
 # Hadiths
-**Link:** [fawazahmed0.github.io/hadiths](https://fawazahmed0.github.io/hadiths)
+**Link:** [Usernew0.github.io/hadiths](https://Usernew0.github.io/hadiths)
 
-**Source code:** [github.com/fawazahmed0/hadiths](https://github.com/fawazahmed0/hadiths)
+**Source code:** [github.com/Usernew0/hadiths](https://github.com/Usernew0/hadiths)

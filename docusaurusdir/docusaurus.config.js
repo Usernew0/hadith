@@ -7,12 +7,12 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
-  url: 'https://fawazahmed0.github.io',
+  url: 'https://Usernew0.github.io',
   baseUrl: '/hadith/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: 'fawazahmed0', // Usually your GitHub org/user name.
+  organizationName: 'Usernew0', // Usually your GitHub org/user name.
   projectName: 'hadith', // Usually your repo name.
   deploymentBranch:'main',
 
