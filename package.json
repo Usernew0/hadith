@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fawazahmed0/hadith.git"
+    "url": "git+https://github.com/Usernew0/hadith.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/fawazahmed0/hadith/issues"
+    "url": "https://github.com/Usernew0/hadith/issues"
   },
-  "homepage": "https://github.com/fawazahmed0/hadith#readme",
+  "homepage": "https://github.com/Usernew0/hadith#readme",
   "dependencies": {
     "@docusaurus/core": "2.0.0-beta.18",
     "@docusaurus/preset-classic": "2.0.0-beta.18",

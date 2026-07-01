@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سُنّة - Sunnah.com</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { font-family: 'Amiri', sans-serif; }
+    .hadith-card { transition: all 0.3s; }
+    .hadith-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .section-card { transition: all 0.3s; }
+    .section-card:hover { transform: translateY(-2px); }
+    .book-card { transition: all 0.3s; }
+  </style>
+</head>
+<body class="bg-[#f8f1e3] text-[#1a1a1a]">
+
+  <!-- HEADER -->
+  <header class="bg-[#8b4513] text-white py-4 sticky top-0 z-50 shadow">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <div class="flex items-center gap-4">
+        <h1 class="text-3xl font-bold">سُنّة</h1>
+        <span class="hidden md:block text-amber-200 text-sm">الكتب الستة</span>
+      </div>
+
+      <div class="flex-1 max-w-2xl mx-8">
+        <div class="relative">
+          <input id="searchInput" type="text" 
+                 placeholder="ابحث عن حديث أو كلمة مفتاحية..."
+                 class="w-full bg-white text-[#1a1a1a] rounded-3xl py-3 px-6 pr-12 focus:outline-none focus:ring-2 focus:ring-amber-400">
+          <button onclick="performImmediateSearch()" 
+                  class="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b4513]">
+            <i class="fas fa-search text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <button onclick="window.location.reload()" class="hover:text-amber-200">
+        <i class="fas fa-home text-2xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 py-8 flex gap-8">
+    <!-- SIDEBAR -->
+    <div class="w-80 flex-shrink-0 bg-white rounded-2xl shadow p-6 h-fit">
+      <h2 class="text-xl font-bold mb-6 text-[#8b4513]">الكتب</h2>
+      <div id="sidebarCollections" class="space-y-3"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1">
+      <div id="mainContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const GITHUB_BASE = "https://raw.githubusercontent.com/Usernew0/hadith/main/jsontocsv/files/";
+    const API_BASE = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1";
+
+    const collections = [
+     // ==================== التسعة الكتب ====================
+     { name: "صحيح البخاري", slug: "bukhari", araFile: "ara-bukhari", engFile: "eng-bukhari" },
+     { name: "صحيح مسلم", slug: "muslim", araFile: "ara-muslim", engFile: "eng-muslim" },
+     { name: "سنن أبي داود", slug: "abudawud", araFile: "ara-abudawud", engFile: "eng-abudawud" },
+     { name: "جامع الترمذي", slug: "tirmidhi", araFile: "ara-tirmidhi", engFile: "eng-tirmidhi" },
+     { name: "سنن النسائي", slug: "nasai", araFile: "ara-nasai", engFile: "eng-nasai" },
+     { name: "سنن ابن ماجه", slug: "ibnmajah", araFile: "ara-ibnmajah", engFile: "eng-ibnmajah" },
+      
+     // ==================== الكتب الأخرى ====================
+     { name: "صحيح ابن خزيمة", slug: "ibnhuzayma", araFile: "ara-ibnhuzayma", engFile: "eng-ibnhuzayma" },
+     { name: "صحيح ابن حبان", slug: "ibnhibban", araFile: "ara-ibnhibban", engFile: "eng-ibnhibban" },
+     { name: "مستدرك الحاكم", slug: "mustadrak", araFile: "ara-mustadrak", engFile: "eng-mustadrak" },
+     { name: "مصنف عبد الرزاق", slug: "musannafrazzaq", araFile: "ara-musannafrazzaq", engFile: "eng-musannafrazzaq" },
+     { name: "مصنف ابن أبي شيبة", slug: "musannabishayba", araFile: "ara-musannabishayba", engFile: "eng-musannabishayba" },
+     { name: "سنن الدارقطني", slug: "darqutni", araFile: "ara-darqutni", engFile: "eng-darqutni" },
+     { name: "السنن الكبرى للبيهقي", slug: "bayhaqi", araFile: "ara-bayhaqi", engFile: "eng-bayhaqi" },
+     { name: "السنن الكبرى للنسائي", slug: "nasaiKubra", araFile: "ara-nasaiKubra", engFile: "eng-nasaiKubra" },
+     { name: "الأدب المفرد", slug: "adabmufred", araFile: "ara-adabmufred", engFile: "eng-adabmufred" },
+     { name: "الشمايل المحمدية", slug: "shamael", araFile: "ara-shamael", engFile: "eng-shamael" },
+      
+     // ==================== المصادر الثانوية ====================
+     { name: "الأربعون النووية", slug: "nawawi40", araFile: "ara-nawawi40", engFile: "eng-nawawi40" },
+     { name: "رياض الصالحين", slug: "riyad", araFile: "ara-riyad", engFile: "eng-riyad" },
+     { name: "مشكاة المصابيح", slug: "mishkat", araFile: "ara-mishkat", engFile: "eng-mishkat" },
+     { name: "بلوغ المرام", slug: "bulugh", araFile: "ara-bulugh", engFile: "eng-bulugh" },
+      
+     { name: "الأربعينات", slug: "collections", araFile: "ara-collections", engFile: "eng-collections" },
+     { name: "حصن المسلم", slug: "hisn", araFile: "ara-hisn", engFile: "eng-hisn" },
+     { name: "الجامع المختصر لفضائل القرآن", slug: "virtues", araFile: "ara-virtues", engFile: "eng-virtues" }
+    ];
+
+    let debounceTimer;
+
+    function debounce(fn, delay = 400) {
+      return (...args) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fn(...args), delay);
+      };
+    }
+
+    // Load Sidebar
+    function loadSidebar() {
+      const container = document.getElementById("sidebarCollections");
+      collections.forEach(col => {
+        const div = document.createElement("div");
+        div.className = "p-3 hover:bg-amber-50 rounded-xl cursor-pointer flex justify-between items-center";
+        div.innerHTML = `
+          <span class="font-medium">${col.name}</span>
+          <span class="text-xs text-gray-400">${col.slug}</span>
+        `;
+        div.onclick = () => loadCollection(col.slug);
+        container.appendChild(div);
+      });
+    }
+
+    // Load Collection (Books/Sections)
+    async function loadCollection(slug) {
+      const col = collections.find(c => c.slug === slug);
+      if (!col) return;
+
+      let html = `
+        <div class="mb-6">
+          <button onclick="loadHomePage()" class="text-[#8b4513] hover:underline mb-4 flex items-center gap-2">
+            ← العودة للرئيسية
+          </button>
+          <h1 class="text-4xl font-bold">${col.name}</h1>
+        </div>
+        <div class="text-center py-10"><i class="fas fa-spinner fa-spin text-3xl text-[#8b4513]"></i></div>
+      `;
+
+      document.getElementById("mainContent").innerHTML = html;
+
+      try {
+        const [resAra, resEng] = await Promise.all([
+          fetch(`${GITHUB_BASE}${col.araFile}.json`),
+          fetch(`${GITHUB_BASE}${col.engFile}.json`)
+        ]);
+
+        if (!resAra.ok || !resEng.ok) throw new Error();
+
+        const dataAra = await resAra.json();
+        const dataEng = await resEng.json();
+
+        html = `<h1 class="text-4xl font-bold mb-8">${dataAra.metadata.name}</h1>`;
+
+        Object.entries(dataAra.metadata.sections || {}).forEach(([id, sectionName]) => {
+          if (id === "0") return;
+
+          const bookHadiths = dataEng.hadiths.filter(h => h.reference.book === parseInt(id));
+          const sectionEng = dataEng.metadata.sections?.[id] || sectionName || `الكتاب ${id}`;
+
+          html += `
+            <div class="section-card bg-white rounded-2xl shadow mb-6 overflow-hidden cursor-pointer" onclick="loadBook('${slug}', ${id})">
+              <div class="bg-[#8b4513] text-white px-6 py-4 font-bold text-xl">${sectionName || sectionEng}</div>
+              <div class="p-6">
+                <div class="flex justify-between">
+                  <span class="text-[#8b4513] font-bold">الكتاب ${id}</span>
+                  <span class="text-gray-500">${bookHadiths.length} حديث</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        document.getElementById("mainContent").innerHTML = html;
+      } catch (e) {
+        document.getElementById("mainContent").innerHTML = `<h1 class="text-red-500 text-3xl">خطأ في تحميل ${col.name}</h1>`;
+      }
+    }
+
+    // Load Specific Book Hadiths
+    async function loadBook(collection, bookId) {
+      const col = collections.find(c => c.slug === collection);
+      if (!col) return;
+
+      try {
+        const [resAra, resEng] = await Promise.all([
+          fetch(`${GITHUB_BASE}${col.araFile}.json`),
+          fetch(`${GITHUB_BASE}${col.engFile}.json`)
+        ]);
+
+        const dataAra = await resAra.json();
+        const dataEng = await resEng.json();
+
+        const bookHadiths = dataEng.hadiths.filter(h => h.reference.book === parseInt(bookId));
+        const sectionName = dataAra.metadata.sections?.[bookId] || `الكتاب ${bookId}`;
+
+        let html = `<h1 class="text-4xl font-bold mb-8">${dataAra.metadata.name} - ${sectionName}</h1>`;
+
+        html += bookHadiths.map(h => {
+          const arabicHadith = dataAra.hadiths.find(ha => 
+            ha.reference.book === h.reference.book && ha.reference.hadith === h.reference.hadith
+          );
+          return `
+            <div class="hadith-card bg-white p-6 rounded-2xl shadow mb-6">
+              <div class="text-[#8b4513] font-bold">${h.reference.book}/${h.reference.hadith}</div>
+              <div class="mt-4 text-xl leading-relaxed">${arabicHadith?.text || ''}</div>
+              <div class="mt-5 text-gray-600">${h.text || h.english || ''}</div>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById("mainContent").innerHTML = html;
+      } catch (e) {
+        document.getElementById("mainContent").innerHTML = `<h1 class="text-red-500">خطأ في تحميل الأحاديث</h1>`;
+      }
+    }
+
+    // NEW: Full database search (works on ALL hadiths across all 6 books)
+    async function searchHadith(query) {
+      if (!query || query.length < 2) return;
+
+      document.getElementById("mainContent").innerHTML = `
+        <h2 class="text-2xl font-bold mb-6">جاري البحث عن "${query}"...</h2>
+        <div class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-[#8b4513]"></i></div>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
+        const results = await res.json();
+
+        let html = `<h2 class="text-2xl font-bold mb-6">نتائج البحث عن "${query}" (${results.length})</h2>`;
+
+        if (results.length === 0) {
+          html += `<p class="text-gray-600">لم يتم العثور على نتائج</p>`;
+        } else {
+          html += results.slice(0, 25).map(h => `
+            <div class="bg-white p-6 rounded-2xl shadow mb-6">
+              <div class="font-bold text-[#8b4513]">${h.reference || ''}</div>
+              <div class="mt-3 text-xl">${h.arabic || h.text || ''}</div>
+              <div class="mt-4 text-gray-600">${h.english || ''}</div>
+            </div>
+          `).join('');
+        }
+
+        document.getElementById("mainContent").innerHTML = html;
+      } catch (e) {
+        document.getElementById("mainContent").innerHTML = `<h2 class="text-red-500">حدث خطأ في البحث</h2>`;
+      }
+    }
+
+    const debouncedSearch = debounce(searchHadith, 380);
+
+    function setupSearch() {
+      const input = document.getElementById("searchInput");
+      input.addEventListener("input", (e) => debouncedSearch(e.target.value.trim()));
+    }
+
+    function performImmediateSearch() {
+      const query = document.getElementById("searchInput").value.trim();
+      if (query) searchHadith(query);
+    }
+
+    // Home Page
+    function loadHomePage() {
+      let html = `<h1 class="text-4xl font-bold mb-10 text-center">الكتب الستة</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+
+      collections.forEach(col => {
+        html += `
+          <div onclick="loadCollection('${col.slug}')" class="book-card bg-white rounded-2xl shadow p-6 cursor-pointer hover:shadow-2xl">
+            <h3 class="text-2xl font-bold text-[#8b4513]">${col.name}</h3>
+            <p class="text-gray-500 mt-1">${col.slug}</p>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      document.getElementById("mainContent").innerHTML = html;
+    }
+
+    // Initialize
+    window.onload = () => {
+      loadSidebar();
+      loadHomePage();
+      setupSearch();
+    };
+  </script>
+</body>
+</html>
